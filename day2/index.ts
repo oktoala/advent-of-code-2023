@@ -9,21 +9,16 @@ type Cube = {
 
 type Data = Record<string, Cube[]>;
 
-const limit = {
-  red: 12,
-  green: 13,
-  blue: 14,
-};
-
-const possibleID: number[] = [];
+const power: number[] = [];
 
 const lineText = await file.text();
 
 const lines = lineText.split("\n").filter((v) => !!v);
 
 lines.forEach((line, i) => {
-  let passed = true;
   const id = line.match(/\d+/g)?.[0];
+
+  const data: Cube = {};
 
   const listSections = line.substring(line.indexOf(":") + 1);
 
@@ -38,16 +33,13 @@ lines.forEach((line, i) => {
       const count = Number(d[0]);
       const color = d[1];
 
-      if (count > limit[color]) {
-        passed = false;
-        return;
+      if (!data[color] || (data[color] && data[color] < count)) {
+        data[color] = count;
       }
     });
   });
-  if (passed) {
-    possibleID.push(Number(id));
-  }
+  power.push(data.red * data.green * data.blue);
 });
 
-const answer = possibleID.reduce((a, b) => a + b, 0);
+const answer = power.reduce((a, b) => a + b, 0);
 console.log(answer);

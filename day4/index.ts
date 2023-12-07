@@ -1,4 +1,4 @@
-const path = "./input.txt";
+const path = "./test.txt";
 const file = Bun.file(path);
 
 const lineText = await file.text();
@@ -6,7 +6,9 @@ const lineText = await file.text();
 const cards = lineText.split("\n").filter((v) => !!v);
 
 let answer = 0;
-cards.forEach((card) => {
+cards.forEach((card, i) => {
+  const cardNumber = i + 1;
+  console.log(cardNumber);
   const cardSplit = card.split("|");
 
   const leftCards = cardSplit[0]

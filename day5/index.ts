@@ -1,4 +1,4 @@
-const path = "./test.txt";
+const path = "./input.txt";
 const file = Bun.file(path);
 
 const lineText = await file.text();
@@ -11,7 +11,7 @@ let seeds = lines[0]
   .filter((v) => !!v)
   .map((v) => Number(v));
 
-const newSeeds: number[][] = [];
+let newSeeds: number[][] = [];
 
 for (let i = 0; i < seeds.length; i += 2) {
   newSeeds.push([seeds[i], seeds[i] + seeds[i + 1] - 1]);
@@ -25,21 +25,33 @@ blocks.forEach((block) => {
     .splice(1)
     .filter((v) => !!v)
     .map((v) => v.split(" ").map((vv) => Number(vv)));
-  const neww: number[] = [];
+  const neww: number[][] = [];
 
-  seeds.forEach((seed) => {
+  while (newSeeds.length > 0) {
+    const m = newSeeds.pop() as number[];
+    let [start, end] = m;
     const founded = range.some(([dest, src, len]) => {
-      if (seed >= src && seed < src + len) {
-        neww.push(seed - src + dest);
+      const overlapStart = Math.max(start, src);
+      const overlapEnd = Math.min(end, src + len);
+
+      if (overlapStart < overlapEnd) {
+        neww.push([overlapStart - src + dest, overlapEnd - src + dest]);
+        if (overlapStart > start) {
+          newSeeds.push([start, overlapStart]);
+        }
+
+        if (end > overlapEnd) {
+          newSeeds.push([overlapEnd, end]);
+        }
         return true;
       }
-      return false;
     });
+
     if (!founded) {
-      neww.push(seed);
+      neww.push([start, end]);
     }
-    seeds = neww;
-  });
+  }
+  newSeeds = neww;
 });
 
-console.log(seeds);
+console.log(Math.min(...newSeeds.map((v) => v[0])));

@@ -1,4 +1,4 @@
-# day2
+# Advent Of Code 2023
 
 To install dependencies:
 

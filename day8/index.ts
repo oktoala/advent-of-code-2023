@@ -1,6 +1,12 @@
 const path = "./input.txt";
 const file = Bun.file(path);
 
+const lcm = (...arr: number[]) => {
+  const gcd = (x: number, y: number) => (!y ? x : gcd(y, x % y));
+  const _lcm = (x: number, y: number) => (x * y) / gcd(x, y);
+  return [...arr].reduce((a, b) => _lcm(a, b));
+};
+
 const lineText = await file.text();
 const instructions = lineText
   .split("\n\n")[0]
@@ -27,23 +33,39 @@ elements.forEach((el) => {
   objectEls[key] = value;
 });
 
+let mapA = Object.keys(objectEls).filter((v) => v.split("")[2] === "A");
+
+const cicle: number[] | undefined[] = mapA.map(() => 0);
+
+const zz: string[] = mapA.map(() => "");
+
 let foundZ = false;
 
 let step = 0;
-let map = "AAA";
 while (!foundZ) {
   instructions.some((ins) => {
-    map = objectEls[map][ins];
+    mapA = mapA.map((m) => objectEls[m][ins]);
 
     step += 1;
 
-    console.log(map);
+    mapA.forEach((m, i) => {
+      if (m.split("")[2] === "Z" && zz[i] !== m) {
+        zz[i] = m;
+        cicle[i] = step;
+        console.log(m);
+      }
+    });
 
-    if (map === "ZZZ") {
+    let notEndZ = cicle.some((v) => v < 1);
+
+    if (!notEndZ) {
       foundZ = true;
-      return true;
+      return foundZ;
     }
   });
 }
 
-console.log(step);
+console.log(cicle);
+console.log(zz);
+const answer = lcm(...cicle);
+console.log(answer);

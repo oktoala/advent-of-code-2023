@@ -41,7 +41,7 @@ histories.some((history, i) => {
   }
 
   for (let j = nextHistories.length - 1; j >= 0; j--) {
-    s += nextHistories[j][nextHistories[j].length - 1];
+    s = nextHistories[j][0] - s;
   }
   sums.push(s);
 });

@@ -1,4 +1,4 @@
-const path = "./test.txt";
+const path = "./input.txt";
 const file = Bun.file(path);
 
 const lineText = await file.text();
@@ -6,6 +6,8 @@ const lineText = await file.text();
 const galaxies: number[] = [];
 let i = 1;
 const rows = lineText.split("\n").filter((v) => !!v);
+
+const multiply = 1000000;
 
 const rowNoGal: number[] = [];
 const colNoGal: number[] = Array.from({ length: rows.length }, (_, i) => i);
@@ -33,22 +35,6 @@ let r = rows.map((v, r) => {
   });
 });
 
-// Expand Row
-const rowExpand = Array.from({ length: rows[0].length }, () => ".");
-rowNoGal.forEach((v, i) => {
-  r.splice(v + i, 0, rowExpand);
-});
-
-// Expand Col
-
-r = r.map((c, i) => {
-  colNoGal.forEach((cc, ii) => {
-    c.splice(cc + ii, 0, ".");
-  });
-
-  return c;
-});
-
 const route: string[][] = [];
 const pairs: Record<string, number> = {};
 
@@ -62,7 +48,36 @@ r.forEach((c, i) => {
       const [vv, p] = ro;
       const [row, col] = p.split(":");
 
-      const s = Math.abs(Number(row) - i) + Math.abs(Number(col) - ii);
+      let rowPlus = 0;
+      rowNoGal.forEach((rng) => {
+        if (
+          (Number(row) >= i && rng >= i && rng < Number(row)) ||
+          (Number(row) <= i && rng <= i && rng >= Number(row))
+        ) {
+          rowPlus += 1;
+        }
+      });
+
+      let colPlus = 0;
+      colNoGal.forEach((cng) => {
+        if (
+          (Number(col) >= ii && cng >= ii && cng < Number(col)) ||
+          (Number(col) <= ii && cng <= ii && cng >= Number(col))
+        ) {
+          colPlus += 1;
+        }
+      });
+
+      rowPlus *= multiply;
+      colPlus *= multiply;
+
+      rowPlus = rowPlus <= 1 ? rowPlus : rowPlus - rowPlus / multiply;
+      colPlus = colPlus <= 1 ? colPlus : colPlus - colPlus / multiply;
+
+      const s =
+        Math.abs(Number(row) - i) +
+        rowPlus +
+        (Math.abs(Number(col) - ii) + colPlus);
 
       pairs[`${vv}-${v}`] = s;
     });
@@ -72,4 +87,5 @@ r.forEach((c, i) => {
 });
 
 const answer = Object.keys(pairs).reduce((a, b) => a + pairs[b], 0);
+// console.log(rowNoGal, colNoGal, route, pairs);
 console.log(answer);
